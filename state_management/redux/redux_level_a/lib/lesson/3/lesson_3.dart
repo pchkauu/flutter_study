@@ -182,6 +182,18 @@ class HomeFloatingSection extends StatelessWidget {
         ),
         FloatingActionButton(
           onPressed: () {
+            store.dispatch(const CounterDecrementAction());
+          },
+          child: const Icon(Icons.remove_rounded),
+        ),
+        FloatingActionButton(
+          onPressed: () {
+            store.dispatch(const CounterPowerAction());
+          },
+          child: const Icon(Icons.upgrade_rounded),
+        ),
+        FloatingActionButton(
+          onPressed: () {
             store.dispatch(const CounterResetAction());
           },
           child: const Icon(Icons.restore_rounded),
