@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sprung/sprung.dart';
 
 Future<void> main() async {
   runZonedGuarded(
@@ -50,12 +51,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 const animationDuration = Duration(seconds: 1);
+const double defaultWidth = 80;
 
 class _HomeScreenState extends State<HomeScreen> {
   MyDraggableData draggableData = const MyDraggableData(
     color: Colors.grey,
     radius: 0,
   );
+
+  bool dragging = false;
 
   @override
   Widget build(BuildContext context) {
@@ -74,19 +78,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 radius: 0,
               ),
               feedback: Container(
-                width: 80,
-                height: 80,
+                width: defaultWidth,
+                height: defaultWidth,
                 color: Colors.green,
               ),
               childWhenDragging: Container(
-                width: 80,
-                height: 80,
+                width: defaultWidth,
+                height: defaultWidth,
                 color: Colors.grey,
               ),
-              child: Container(
-                width: 80,
-                height: 80,
-                color: Colors.green,
+              child: DragTarget(
+                builder: (context, candidateData, rejectedData) {
+                  return AnimatedContainer(
+                    duration: animationDuration,
+                    width: dragging ? defaultWidth * 1.2 : defaultWidth,
+                    height: dragging ? defaultWidth * 1.2 : defaultWidth,
+                    color: candidateData.isNotEmpty
+                        ? Colors.yellow
+                        : dragging
+                            ? Colors.red
+                            : Colors.green,
+                  );
+                },
               ),
             ),
             DragTarget<MyDraggableData>(
@@ -97,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               builder: ((context, candidateData, rejectedData) {
                 return AnimatedContainer(
+                  curve: Sprung.criticallyDamped,
                   duration: animationDuration,
                   width: candidateData.isEmpty ? 60 : 120,
                   height: candidateData.isEmpty ? 60 : 120,
@@ -118,20 +132,32 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Draggable(
               onDragUpdate: (details) {},
+              onDragStarted: () {
+                setState(() {
+                  dragging = true;
+                });
+              },
+              onDragEnd: (details) {
+                setState(() {
+                  dragging = false;
+                });
+              },
               data: const MyDraggableData(
                 color: Colors.blue,
                 radius: 100,
               ),
               feedback: AnimatedContainer(
+                curve: Sprung.overDamped,
                 duration: animationDuration,
-                width: 80,
-                height: 80,
+                width: defaultWidth,
+                height: defaultWidth,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.blue,
                 ),
               ),
               childWhenDragging: AnimatedContainer(
+                curve: Sprung.overDamped,
                 duration: animationDuration,
                 width: 60,
                 height: 60,
@@ -141,9 +167,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               child: AnimatedContainer(
+                curve: Sprung.overDamped,
                 duration: animationDuration,
-                width: 80,
-                height: 80,
+                width: defaultWidth,
+                height: defaultWidth,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.blue,
