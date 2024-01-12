@@ -41,14 +41,21 @@ class DragAndDropApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+const animationDuration = Duration(seconds: 1);
+
 class _HomeScreenState extends State<HomeScreen> {
-  Color targerColor = Colors.grey;
+  MyDraggableData draggableData = const MyDraggableData(
+    color: Colors.grey,
+    radius: 0,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -61,55 +68,86 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Draggable<Color>(
-              data: Colors.green,
+            Draggable<MyDraggableData>(
+              data: const MyDraggableData(
+                color: Colors.green,
+                radius: 0,
+              ),
               feedback: Container(
-                width: 40,
-                height: 40,
+                width: 80,
+                height: 80,
                 color: Colors.green,
               ),
               childWhenDragging: Container(
-                width: 40,
-                height: 40,
+                width: 80,
+                height: 80,
                 color: Colors.grey,
               ),
               child: Container(
-                width: 40,
-                height: 40,
+                width: 80,
+                height: 80,
                 color: Colors.green,
               ),
             ),
-            DragTarget<Color>(
+            DragTarget<MyDraggableData>(
               onAccept: (data) {
                 setState(() {
-                  targerColor = data;
+                  draggableData = data;
                 });
               },
               builder: ((context, candidateData, rejectedData) {
-                return Container(
-                  width: 120,
-                  height: 120,
-                  color:
-                      candidateData.isEmpty ? targerColor : candidateData.first,
+                return AnimatedContainer(
+                  duration: animationDuration,
+                  width: candidateData.isEmpty ? 60 : 120,
+                  height: candidateData.isEmpty ? 60 : 120,
+                  decoration: BoxDecoration(
+                    color: candidateData.isEmpty
+                        ? draggableData.color
+                        : candidateData.first?.color,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(
+                        candidateData.isEmpty
+                            ? draggableData.radius
+                            : candidateData.first?.radius ??
+                                draggableData.radius,
+                      ),
+                    ),
+                  ),
                 );
               }),
             ),
             Draggable(
-              data: Colors.blue,
-              feedback: Container(
-                width: 40,
-                height: 40,
+              onDragUpdate: (details) {},
+              data: const MyDraggableData(
                 color: Colors.blue,
+                radius: 100,
               ),
-              childWhenDragging: Container(
-                width: 40,
-                height: 40,
-                color: Colors.grey,
+              feedback: AnimatedContainer(
+                duration: animationDuration,
+                width: 80,
+                height: 80,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.blue,
+                ),
               ),
-              child: Container(
-                width: 40,
-                height: 40,
-                color: Colors.blue,
+              childWhenDragging: AnimatedContainer(
+                duration: animationDuration,
+                width: 60,
+                height: 60,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                ),
+              ),
+              child: AnimatedContainer(
+                duration: animationDuration,
+                width: 80,
+                height: 80,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.blue,
+                ),
               ),
             ),
           ],
@@ -117,4 +155,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+class MyDraggableData {
+  final Color color;
+  final double radius;
+
+  const MyDraggableData({
+    required this.color,
+    required this.radius,
+  });
 }
