@@ -32,6 +32,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.4.9
+  freezed_annotation: ^2.4.1
+  http: ^1.2.0
   riverpod_annotation: ^2.3.3
   talker: ^4.0.0
 
@@ -41,6 +43,8 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
+  freezed: ^2.4.6
+  json_serializable: ^6.7.1
   riverpod_generator: ^2.3.9
   riverpod_lint: ^2.3.7
 

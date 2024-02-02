@@ -6,7 +6,7 @@ part of 'main.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$helloWordHash() => r'f1b32316ad569d732b8857b433d6ae9208ed2693';
+String _$helloWordHash() => r'bbcaae1f3ae4cc9b4ba1de2736c03bc1c8330d26';
 
 /// See also [helloWord].
 @ProviderFor(helloWord)
