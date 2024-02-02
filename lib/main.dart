@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_study/database/database.dart';
 import 'package:flutter_study/provider/provider.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:talker/talker.dart';
 
 final talker = Talker();
@@ -39,17 +38,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.exists(activityProvider);
-
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Example')),
-        body: const Home(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-        ),
-      ),
+      home: Home(),
     );
   }
 }
@@ -59,22 +50,45 @@ class Home extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activity = ref.watch(activityProvider);
+    final activity = ref.watch(todoListProvider);
 
-    return Center(
-      /// Since network-requests are asynchronous and can fail, we need to
-      /// handle both error and loading states. We can use pattern matching for this.
-      /// We could alternatively use `if (activity.isLoading) { ... } else if (...)`
-      child: switch (activity) {
-        AsyncData(:final value) => Text('Activity: ${value.activity}'),
-        AsyncError(
-          :final error,
-          :final stackTrace,
-        ) =>
-          Text(error.toString()),
-        AsyncLoading() => const CircularProgressIndicator(),
-        _ => const Text('initial'),
-      },
+    return Scaffold(
+      body: Center(
+        /// Since network-requests are asynchronous and can fail, we need to
+        /// handle both error and loading states. We can use pattern matching for this.
+        /// We could alternatively use `if (activity.isLoading) { ... } else if (...)`
+        child: switch (activity) {
+          AsyncData(:final value) => ListView.builder(
+              itemCount: value.length,
+              itemBuilder: (context, index) {
+                return Dismissible(
+                  onDismissed: (direction) {
+                    ref
+                        .read(todoListProvider.notifier)
+                        .removeTodo(value[index]);
+                  },
+                  key: UniqueKey(),
+                  child: Card(
+                    child: Text('$index ${value[index].content}'),
+                  ),
+                );
+              },
+            ),
+          AsyncError(
+            :final error,
+            :final stackTrace,
+          ) =>
+            Text(error.toString()),
+          AsyncLoading() => const CircularProgressIndicator(),
+          _ => const Text('initial'),
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          ref.read(todoListProvider.notifier).addTodo();
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

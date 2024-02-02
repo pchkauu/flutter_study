@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_study/database/database.dart';
 import 'package:flutter_study/main.dart';
 import 'package:flutter_study/model/activity.dart';
 import 'package:http/http.dart' as http;
@@ -23,7 +24,33 @@ Future<Activity> activity(ActivityRef ref) async {
     talker.handle(error, stack);
     rethrow;
   }
+}
 
-  throw UnimplementedError();
-  // Using dart:convert, we then decode the JSON payload into a Map data structure.
+@riverpod
+class TodoList extends _$TodoList {
+  @override
+  Future<List<TodoItem>> build() async {
+    final allItems = await database.select(database.todoItems).get();
+
+    return allItems;
+  }
+
+  Future<void> addTodo() async {
+    await database.into(database.todoItems).insert(TodoItemsCompanion.insert(
+          title: 'todo: finish drift setup',
+          content: 'We can now write queries and define our own tables.',
+        ));
+
+    state = AsyncData(await database.select(database.todoItems).get());
+
+    // state = AsyncData(allItems);
+  }
+
+  Future<void> removeTodo(TodoItem todoItem) async {
+    await database.delete(database.todoItems).delete(todoItem);
+
+    state = AsyncData(await database.select(database.todoItems).get());
+
+    // state = AsyncData(allItems);
+  }
 }
