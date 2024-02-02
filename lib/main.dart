@@ -2,15 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_study/database/database.dart';
 import 'package:flutter_study/provider/provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:talker/talker.dart';
 
-part 'main.g.dart';
-
 final talker = Talker();
+final database = AppDatabase();
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await runZonedGuarded(
     () async {
       runApp(
@@ -27,11 +29,6 @@ Future<void> main() async {
       );
     },
   );
-}
-
-@riverpod
-String helloWord(HelloWordRef ref) {
-  return 'Hello World';
 }
 
 // Extend ConsumerWidget instead of StatelessWidget, which is exposed by Riverpod
