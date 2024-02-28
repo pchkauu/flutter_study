@@ -62,14 +62,14 @@ class Home extends ConsumerWidget {
               itemCount: value.length,
               itemBuilder: (context, index) {
                 return Dismissible(
-                  onDismissed: (direction) {
-                    ref
+                  onDismissed: (direction) async {
+                    await ref
                         .read(todoListProvider.notifier)
                         .removeTodo(value[index]);
                   },
                   key: UniqueKey(),
                   child: Card(
-                    child: Text('$index ${value[index].content}'),
+                    child: Text('$index ${value[index].title}'),
                   ),
                 );
               },
@@ -79,15 +79,18 @@ class Home extends ConsumerWidget {
             :final stackTrace,
           ) =>
             Text(error.toString()),
-          AsyncLoading() => const CircularProgressIndicator(),
           _ => const Text('initial'),
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ref.read(todoListProvider.notifier).addTodo();
+          ref.read(todoListProvider.notifier).addTodo(
+              ref.read(todoListProvider.notifier).state.value?.length ?? 0);
         },
-        child: const Icon(Icons.add),
+        child: switch (activity) {
+          AsyncLoading() => const CircularProgressIndicator(),
+          _ => const Icon(Icons.add),
+        },
       ),
     );
   }

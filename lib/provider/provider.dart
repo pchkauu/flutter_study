@@ -20,7 +20,7 @@ Future<Activity> activity(ActivityRef ref) async {
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     // Finally, we convert the Map into an Activity instance.
     return Activity.fromJson(json);
-  } catch (error, stack) {
+  } on Object catch (error, stack) {
     talker.handle(error, stack);
     rethrow;
   }
@@ -35,19 +35,23 @@ class TodoList extends _$TodoList {
     return allItems;
   }
 
-  Future<void> addTodo() async {
+  Future<void> addTodo(int index) async {
     await database.into(database.todoItems).insert(TodoItemsCompanion.insert(
-          title: 'todo: finish drift setup',
+          title: 'todo $index: finish drift setup',
           content: 'We can now write queries and define our own tables.',
         ));
 
-    state = AsyncData(await database.select(database.todoItems).get());
+    ref.invalidateSelf();
+
+    await future;
 
     // state = AsyncData(allItems);
   }
 
   Future<void> removeTodo(TodoItem todoItem) async {
     await database.delete(database.todoItems).delete(todoItem);
+
+    state = const AsyncLoading();
 
     state = AsyncData(await database.select(database.todoItems).get());
 
