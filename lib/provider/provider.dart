@@ -53,6 +53,8 @@ class TodoList extends _$TodoList {
 
     state = const AsyncLoading();
 
+    // await Future.delayed(const Duration(seconds: 1));
+
     state = AsyncData(await database.select(database.todoItems).get());
 
     // state = AsyncData(allItems);
